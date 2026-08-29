@@ -23,6 +23,10 @@ services:
     startCommand: node apps/api/dist/main.js
     healthCheckPath: /health
     envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: development   # Render defaults to 'production', which disables TypeORM synchronize (no migrations exist)
       - key: DATABASE_URL
         fromDatabase:
           name: isafedrive-db
@@ -41,6 +45,8 @@ services:
     startCommand: node apps/passenger-web/server.mjs
     healthCheckPath: /
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: API_URL
         value: https://isafedrive-api.onrender.com
 
@@ -53,6 +59,8 @@ services:
     startCommand: node apps/driver-web/server.mjs
     healthCheckPath: /
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: API_URL
         value: https://isafedrive-api.onrender.com
 
