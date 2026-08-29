@@ -56,11 +56,6 @@ services:
       - key: API_URL
         value: https://isafedrive-api.onrender.com
 
-  - type: web
-    name: isafedrive-admin
-    runtime: node
-    plan: free
-    rootDir: .
-    buildCommand: npm install && npm run build -w apps/admin-dashboard
-    startCommand: npm --workspace apps/admin-dashboard exec next start
-    healthCheckPath: /
+  # NOTE: admin-dashboard is deployed on Vercel (Next.js), not Render.
+  # Vercel project: Root Directory = apps/admin-dashboard, Framework = Next.js,
+  # build = next build, env NEXT_PUBLIC_API_URL = https://isafedrive-api.onrender.com/api/v1
