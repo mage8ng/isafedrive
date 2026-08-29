@@ -37,6 +37,13 @@ async function bootstrap() {
   app.getHttpAdapter().getInstance().get('/health', (_req, res) => {
     res.status(200).json({ ok: true });
   });
-  await app.listen(process.env.PORT ?? 3000);
+  const port = Number(process.env.PORT ?? 3000);
+  await app.listen(port, '0.0.0.0');
+  // Also listen on 3000 so the pax/driver proxies can reach the API on the
+  // Render internal network at http://isafedrive-api:3000 (Render's PORT
+  // override is unreliable, so we expose 3000 explicitly).
+  if (port !== 3000) {
+    app.listen(3000, '0.0.0.0');
+  }
 }
 bootstrap();
