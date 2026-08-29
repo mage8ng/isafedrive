@@ -66,6 +66,22 @@ services:
       - key: API_URL
         value: http://isafedrive-api:3000
 
-  # NOTE: admin-dashboard is deployed on Vercel (Next.js), not Render.
-  # Vercel project: Root Directory = apps/admin-dashboard, Framework = Next.js,
+  - type: web
+    name: isafedrive-admin
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build -w apps/admin-dashboard
+    startCommand: npm run start -w apps/admin-dashboard
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: "3100"
+      - key: NEXT_PUBLIC_API_URL
+        value: https://isafedrive-api.onrender.com/api/v1
+
+  # NOTE: admin-dashboard is deployed here on Render (Next.js) for simplicity.
+  # Vercel alternative: Root Directory = apps/admin-dashboard, Framework = Next.js,
   # build = next build, env NEXT_PUBLIC_API_URL = https://isafedrive-api.onrender.com/api/v1
