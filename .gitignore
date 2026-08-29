@@ -13,3 +13,7 @@ cloudflared-ingress.yml
 .next/
 .turbo/
 isafedrive_colab.zip
+
+data/
+coverage/
+*.pid
