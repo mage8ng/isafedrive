@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>iSafeDrive - Passenger</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="iSafeDrive" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="splash">
+    <img src="/logo.svg" alt="iSafeDrive" />
+    <div class="splash-bar"><span></span></div>
+  </div>
+
+  <div id="app">
+    <div id="map"></div>
+
+    <header class="topbar">
+      <img src="/logo.svg" alt="iSafeDrive" class="topbar-logo" />
+      <span id="wallet-chip" class="chip hidden"></span>
+      <button id="btn-bell" class="icon-btn" title="Notifications">🔔</button>
+      <button id="btn-account" class="icon-btn" title="Account">☰</button>
+      <button id="btn-logout" class="icon-btn" title="Sign out">⏻</button>
+    </header>
+
+    <div id="notif-panel" class="notif-panel hidden">
+      <div class="notif-head">
+        <b>Notifications</b>
+        <button id="notif-close" class="icon-btn2" title="Close">✕</button>
+      </div>
+      <ul id="notif-list" class="notif-list"><li class="muted">No notifications</li></ul>
+    </div>
+
+    <section id="view-account" class="overlay-card account-card hidden">
+      <div class="ac-head">
+        <button id="ac-back" class="icon-btn2" title="Back">‹</button>
+        <h2 id="ac-title">Account</h2>
+      </div>
+      <ul id="ac-menu" class="ac-menu">
+        <li data-ac="profile">👤 Profile</li>
+        <li data-ac="payment">💳 Payment</li>
+        <li data-ac="support">🛟 Support</li>
+        <li data-ac="safety">🛡️ Safety</li>
+        <li data-ac="places">📍 Saved Places</li>
+        <li data-ac="earn">🎁 Earn with iSafeDrive</li>
+        <li data-ac="settings">⚙️ Settings</li>
+      </ul>
+
+      <div id="ac-profile" class="ac-content hidden">
+        <div class="profile-head">
+          <div class="avatar-wrap">
+            <img id="ac-avatar-img" class="avatar hidden" alt="avatar" />
+            <div id="ac-avatar-fallback" class="avatar avatar-fallback">?</div>
+            <button id="ac-avatar-btn" class="avatar-cam" title="Change photo">📷</button>
+            <input id="ac-avatar-in" type="file" accept="image/*" class="hidden" />
+          </div>
+          <div class="profile-id">
+            <b id="ac-name-disp">-</b>
+            <span id="ac-phone-disp" class="muted small"></span>
+          </div>
+        </div>
+        <label>Full name
+          <input id="ac-name" placeholder="Your name" />
+        </label>
+        <label>Email
+          <input id="ac-email" type="email" placeholder="you@example.com" />
+        </label>
+        <button id="ac-save-profile" class="primary full">Save profile</button>
+        <p id="ac-pf-msg" class="msg"></p>
+      </div>
+
+      <div id="ac-payment" class="ac-content hidden">
+        <div class="wallet-box">
+          <span class="muted small">Wallet balance</span>
+          <div id="ac-wallet-bal" class="wallet-bal">₦0</div>
+        </div>
+        <div class="pm-current">
+          <span class="muted small">Current payment method</span>
+          <b id="ac-pm-current">Cash</b>
+        </div>
+        <div id="ac-card-box" class="add-card hidden">
+          <label>Card number
+            <input id="ac-card-number" placeholder="1234 5678 9012 3456" inputmode="numeric" />
+          </label>
+          <div class="row">
+            <label>Expiry
+              <input id="ac-card-exp" placeholder="MM/YY" />
+            </label>
+            <label>CVV
+              <input id="ac-card-cvv" placeholder="123" inputmode="numeric" />
+            </label>
+          </div>
+          <button id="ac-card-save" class="primary full">Save card</button>
+        </div>
+        <button id="ac-toggle-card" class="ghost full">Add debit / credit card</button>
+        <hr class="sep" />
+        <div class="topup">
+          <span class="muted small">Top up wallet</span>
+          <div class="row">
+            <input id="ac-topup-amt" type="number" min="50" placeholder="Amount (₦)" />
+            <button id="ac-topup-btn" class="primary">Deposit</button>
+          </div>
+          <p id="ac-topup-msg" class="muted small center"></p>
+        </div>
+      </div>
+
+      <div id="ac-support" class="ac-content hidden">
+        <p class="muted">Need help? Reach our 24/7 team.</p>
+        <div class="support-row"><span>📞 Call</span><b>+234 800 4723 374</b></div>
+        <div class="support-row"><span>✉️ Email</span><b>support@isafedrive.com</b></div>
+        <label>Send a message
+          <textarea id="ac-support-msg" rows="3" placeholder="Describe your issue..."></textarea>
+        </label>
+        <button id="ac-support-send" class="primary full">Send message</button>
+      </div>
+
+      <div id="ac-safety" class="ac-content hidden">
+        <button id="ac-sos" class="danger full sos-btn">🚨 EMERGENCY SOS</button>
+        <p class="muted small center">Hold to alert emergency contacts &amp; share live location (demo).</p>
+        <ul class="tips">
+          <li>Share your trip PIN only with your driver.</li>
+          <li>Verify the vehicle plate before boarding.</li>
+          <li>Use in-app chat — your number stays private.</li>
+          <li>Trust your instincts; cancel unsafe rides freely.</li>
+        </ul>
+      </div>
+
+      <div id="ac-places" class="ac-content hidden">
+        <div class="row">
+          <input id="ac-place-label" placeholder="Label (Home, Work...)" />
+        </div>
+        <div class="row">
+          <input id="ac-place-addr" placeholder="Address" />
+          <button id="ac-place-add" class="primary">Add</button>
+        </div>
+        <ul id="ac-places-list" class="mini-list"></ul>
+      </div>
+
+      <div id="ac-earn" class="ac-content hidden">
+        <p class="muted">Invite friends and earn ride credits.</p>
+        <div class="ref-box">
+          <span class="muted small">Your referral code</span>
+          <div id="ac-ref-code" class="ref-code">ISD-????</div>
+        </div>
+        <button id="ac-ref-copy" class="ghost full">Copy code</button>
+      </div>
+
+      <div id="ac-settings" class="ac-content hidden">
+        <div class="set-row">
+          <span>Location sharing</span>
+          <input id="ac-tog-loc" type="checkbox" checked />
+        </div>
+        <div class="set-row">
+          <span>Push notifications</span>
+          <input id="ac-tog-push" type="checkbox" checked />
+        </div>
+        <div class="set-row">
+          <span>Email receipts</span>
+          <input id="ac-tog-email" type="checkbox" />
+        </div>
+        <button id="ac-logout" class="danger full">Log out</button>
+      </div>
+    </section>
+
+    <section id="view-auth" class="overlay-card auth-card">
+      <h1>Safe Rides.<br />Trusted Drivers.</h1>
+      <div class="auth-tabs">
+        <button class="atab active" data-atab="login">Sign in</button>
+        <button class="atab" data-atab="register">Register</button>
+      </div>
+      <p id="auth-msg" class="msg"></p>
+
+      <div id="auth-login">
+        <label>Phone number
+          <input id="in-phone" placeholder="+2348012345678" autocomplete="tel" inputmode="tel" />
+        </label>
+        <label>Password
+          <input id="in-password" type="password" placeholder="Your password" autocomplete="current-password" />
+        </label>
+        <button id="btn-login" class="primary full">Sign in</button>
+        <button id="btn-quick" class="ghost full">Continue with phone only</button>
+
+        <div class="social">
+          <button id="btn-google" class="ghost full social-btn">🔵 Continue with Google</button>
+          <button id="btn-email-otp" class="ghost full social-btn">✉️ Verify with email code</button>
+        </div>
+        <div id="email-otp-box" class="hidden">
+          <label>Email
+            <input id="in-otp-email" type="email" placeholder="you@example.com" />
+          </label>
+          <button id="btn-send-otp" class="primary full">Send code</button>
+          <label>Code
+            <input id="in-otp-code" placeholder="6-digit code" inputmode="numeric" />
+          </label>
+          <button id="btn-verify-otp" class="primary full">Verify &amp; continue</button>
+        </div>
+      </div>
+
+      <div id="auth-register" class="hidden">
+        <label>Full name
+          <input id="in-name" placeholder="Ada Obi" autocomplete="name" />
+        </label>
+        <label>Phone number
+          <input id="in-reg-phone" placeholder="+2348012345678" autocomplete="tel" inputmode="tel" />
+        </label>
+        <label>Password <span class="muted">(min 8 chars)</span>
+          <input id="in-reg-password" type="password" placeholder="Create a password" autocomplete="new-password" />
+        </label>
+        <div class="pay-choice">
+          <span class="muted">How would you pay?</span>
+          <label class="radio"><input type="radio" name="regpay" value="cash" checked /> Cash</label>
+          <label class="radio"><input type="radio" name="regpay" value="card" /> Add debit / credit card</label>
+          <label class="radio"><input type="radio" name="regpay" value="later" /> Set up later</label>
+        </div>
+        <div id="reg-card-box" class="hidden">
+          <label>Card number
+            <input id="in-reg-card" placeholder="1234 5678 9012 3456" inputmode="numeric" />
+          </label>
+        </div>
+        <button id="btn-register" class="primary full">Create account</button>
+      </div>
+    </section>
+
+    <div id="search-panel" class="overlay-card search-panel hidden">
+      <div class="search-row">
+        <span class="dot dot-a"></span>
+        <input id="in-pickup" placeholder="Pickup - tap to search" autocomplete="off" />
+      </div>
+      <div class="search-row">
+        <span class="dot dot-b"></span>
+        <input id="in-dest" placeholder="Where to?" autocomplete="off" />
+      </div>
+      <div id="search-results" class="search-results hidden"></div>
+    </div>
+
+    <button id="btn-3d" class="map-fab" title="Toggle 3D">3D</button>
+    <button id="btn-locate" class="map-fab fab-locate" title="My location">◎</button>
+
+    <div id="sheet" class="sheet hidden">
+      <div id="tab-ride">
+        <div id="categories" class="cats"></div>
+        <div id="estimate-box" class="estimate hidden"></div>
+        <div class="row">
+          <button id="btn-estimate" class="ghost grow">Fare</button>
+          <button id="btn-book" class="primary grow">Book ride</button>
+        </div>
+      </div>
+
+      <div id="tab-delivery" class="hidden">
+        <label>Recipient
+          <input id="dl-name" placeholder="Name" />
+        </label>
+        <label>Phone
+          <input id="dl-phone" placeholder="+234..." inputmode="tel" />
+        </label>
+        <label>Package
+          <input id="dl-item" placeholder="What are you sending?" />
+        </label>
+        <div class="row">
+          <select id="dl-size" class="grow">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+          <button id="btn-dl-send" class="primary grow">Send package</button>
+        </div>
+        <ul id="dl-list" class="mini-list"></ul>
+      </div>
+
+      <div id="tab-history" class="hidden">
+        <ul id="rides-list" class="mini-list"><li class="muted">Loading...</li></ul>
+      </div>
+
+      <div id="tab-profile" class="hidden">
+        <div class="profile-head">
+          <div class="avatar-wrap">
+            <img id="avatar-img" class="avatar hidden" alt="avatar" />
+            <div id="avatar-fallback" class="avatar avatar-fallback">?</div>
+            <button id="btn-avatar" class="avatar-cam" title="Change photo">📷</button>
+            <input id="in-avatar" type="file" accept="image/*" class="hidden" />
+          </div>
+          <div class="profile-id">
+            <b id="profile-name">-</b>
+            <span id="profile-phone" class="muted small"></span>
+            <span id="profile-rating" class="muted small"></span>
+          </div>
+        </div>
+        <label>Full name
+          <input id="pf-name" placeholder="Your name" />
+        </label>
+        <label>Email
+          <input id="pf-email" type="email" placeholder="you@example.com" />
+        </label>
+        <button id="btn-save-profile" class="primary full">Save profile</button>
+        <p id="pf-msg" class="msg"></p>
+      </div>
+    </div>
+
+    <section id="view-track" class="sheet track-sheet hidden">
+      <div class="status-head">
+        <span id="track-status" class="badge">searching</span>
+        <h2 id="track-title">Finding your driver</h2>
+        <p id="track-sub" class="muted">Matching nearby drivers</p>
+      </div>
+      <ol id="timeline" class="timeline"></ol>
+      <div class="pin-card">
+        <div>
+          <span class="muted small">Trip PIN</span>
+          <div id="ride-pin" class="pin">- - - -</div>
+        </div>
+        <div class="fare">
+          <span class="muted small">Fare</span>
+          <div id="ride-fare">NGN --</div>
+        </div>
+      </div>
+      <div id="driver-card" class="driver-card hidden">
+        <div class="driver-avatar">🚕</div>
+        <div class="driver-info">
+          <b id="driver-name">Driver</b>
+          <span id="driver-meta" class="muted small"></span>
+        </div>
+        <button id="btn-contact" class="ghost">Call</button>
+      </div>
+      <div class="chat-card">
+        <div id="chat-log" class="chat-log"></div>
+        <div class="chat-input">
+          <input id="chat-text" placeholder="Message your driver..." maxlength="500" />
+          <button id="btn-chat-send" class="primary">Send</button>
+        </div>
+      </div>
+
+      <div id="pay-card" class="pay-card hidden">
+        <div class="pay-head">
+          <span class="muted small">Fare due on arrival</span>
+          <b id="pay-amount">₦0</b>
+        </div>
+        <div class="pay-methods">
+          <button class="payopt" data-method="wallet">Wallet</button>
+          <button class="payopt active" data-method="cash">Cash</button>
+          <button class="payopt" data-method="card">Card</button>
+        </div>
+        <button id="btn-pay" class="primary full">Pay now</button>
+        <div id="pay-status" class="muted small center"></div>
+      </div>
+
+      <button id="btn-cancel-ride" class="danger full">Cancel ride</button>
+      <button id="btn-track-close" class="ghost full hidden">Done</button>
+    </section>
+
+    <p id="toast" class="toast hidden"></p>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="bnav active" data-tab="ride"><span>🚕</span>Ride</button>
+    <button class="bnav" data-tab="delivery"><span>📦</span>Delivery</button>
+    <button class="bnav" data-tab="history"><span>🕘</span>History</button>
+    <button class="bnav" data-tab="profile"><span>👤</span>Profile</button>
+  </nav>
+
+  <script src="/app.js"></script>
+</body>
+</html>

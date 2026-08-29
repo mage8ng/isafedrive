@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>iSafeDrive - Driver</title>
+  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="iSafeDrive Driver" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#b45309" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="splash">
+    <img src="logo.svg" alt="iSafeDrive" />
+    <p>Driver App</p>
+    <div class="splash-bar"><span></span></div>
+  </div>
+
+  <div id="app">
+    <div id="map"></div>
+
+    <header class="topbar">
+      <img src="logo.svg" class="topbar-logo" alt="iSafeDrive" />
+      <button id="online-toggle" class="online-toggle">GO ONLINE</button>
+      <div class="topbar-actions">
+        <button id="btn-bell" class="icon-btn" title="Notifications">🔔</button>
+        <button id="btn-account" class="icon-btn" title="Account">☰</button>
+        <button id="btn-logout" class="icon-btn" title="Sign out">⏻</button>
+      </div>
+    </header>
+
+    <div id="notif-panel" class="pop-panel hidden">
+      <div class="pop-head"><b>Notifications</b><button id="btn-notif-close" class="x" title="Close">✕</button></div>
+      <ul id="notif-list" class="mini-list"><li class="muted">No notifications</li></ul>
+    </div>
+
+    <div class="gps-pill" id="gps-pill">Acquiring GPS...</div>
+
+    <section id="view-auth" class="overlay-card auth-card">
+      <h1>Drive &amp; Earn</h1>
+      <div class="auth-tabs">
+        <button class="atab active" data-atab="login">Sign in</button>
+        <button class="atab" data-atab="register">Register</button>
+      </div>
+      <p id="auth-msg" class="msg"></p>
+
+      <div id="auth-login">
+        <label>Phone number
+          <input id="in-phone" placeholder="+2348012345678" autocomplete="tel" inputmode="tel" />
+        </label>
+        <label>Password
+          <input id="in-password" type="password" placeholder="Your password" autocomplete="current-password" />
+        </label>
+        <button id="btn-login" class="primary full">Sign in</button>
+        <button id="btn-google" class="google-btn full">Continue with Google</button>
+        <button id="btn-quick" class="ghost full">Continue with phone only</button>
+        <div id="auth-email-verify" class="hidden">
+          <label>Email
+            <input id="in-verify-email" type="email" placeholder="you@example.com" autocomplete="email" />
+          </label>
+          <button id="btn-send-otp" class="primary full">Send email code</button>
+          <label>Code
+            <input id="in-verify-code" placeholder="6-digit code" inputmode="numeric" maxlength="8" />
+          </label>
+          <button id="btn-verify-otp" class="primary full">Verify &amp; sign in</button>
+        </div>
+        <button id="btn-email-verify-toggle" class="link-btn full">Verify with email code</button>
+      </div>
+
+      <div id="auth-register" class="hidden">
+        <label>Full name
+          <input id="in-name" placeholder="Chinedu Okafor" autocomplete="name" />
+        </label>
+        <label>Phone number
+          <input id="in-reg-phone" placeholder="+2348012345678" autocomplete="tel" inputmode="tel" />
+        </label>
+        <label>Email <span class="muted">(optional)</span>
+          <input id="in-reg-email" type="email" placeholder="you@example.com" autocomplete="email" />
+        </label>
+        <label>Password <span class="muted">(min 8 chars)</span>
+          <input id="in-reg-password" type="password" placeholder="Create a password" autocomplete="new-password" />
+        </label>
+        <label>Vehicle <span class="muted">(first time only)</span>
+          <input id="in-vehicle" placeholder="e.g. Toyota Corolla" />
+        </label>
+        <div class="row">
+          <select id="in-category" class="grow">
+            <option value="economy">Economy</option>
+            <option value="comfort">Comfort</option>
+            <option value="xl">XL</option>
+            <option value="premium">Premium</option>
+            <option value="motorcycle">Bike</option>
+            <option value="tricycle">Keke</option>
+          </select>
+        </div>
+        <div class="pay-method">
+          <span class="muted small">How would you pay?</span>
+          <label class="radio"><input type="radio" name="paymethod" value="cash" checked /> Cash</label>
+          <label class="radio"><input type="radio" name="paymethod" value="card" /> Add debit/credit card</label>
+          <label class="radio"><input type="radio" name="paymethod" value="later" /> Set up later</label>
+        </div>
+        <button id="btn-google-reg" class="google-btn full">Continue with Google</button>
+        <button id="btn-register" class="primary full">Create driver account</button>
+      </div>
+    </section>
+
+    <div id="dash" class="sheet hidden">
+      <div id="tab-driver-requests">
+        <div class="earn-row">
+          <div class="earn-box">
+            <span class="muted small">Today</span>
+            <b id="earn-today">₦0</b>
+          </div>
+          <div class="earn-box">
+            <span class="muted small">Rating</span>
+            <b id="earn-rating">-</b>
+          </div>
+          <div class="earn-box">
+            <span class="muted small">Trips</span>
+            <b id="earn-trips">0</b>
+          </div>
+        </div>
+        <h3 class="section-h">Ride requests</h3>
+        <div id="requests-box">
+          <ul id="requests-list" class="mini-list"><li class="muted">Loading...</li></ul>
+        </div>
+        <p id="no-trip" class="muted" style="text-align:center">No active trip. Requests appear above.</p>
+      </div>
+
+      <div id="tab-driver-trip" class="hidden">
+        <h3 class="section-h">My active trip</h3>
+        <div id="trip-box" class="trip-box hidden">
+          <div id="trip-passenger" class="trip-passenger"></div>
+          <div id="trip-route" class="muted small"></div>
+          <div id="trip-payment" class="payment-pill hidden"></div>
+          <div class="row" style="margin-top:10px">
+            <button id="btn-arrived" class="ghost grow">Arrived</button>
+            <button id="btn-complete" class="primary grow hidden">Complete trip</button>
+            <button id="btn-cancel" class="danger grow">Cancel</button>
+          </div>
+          <div id="pin-row" class="hidden" style="margin-top:10px">
+            <label class="muted small">Ask the rider for their 4-digit PIN
+              <input id="in-pin" placeholder="- - - -" maxlength="4" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:8px" />
+            </label>
+            <button id="btn-start" class="primary full">Start trip</button>
+          </div>
+          <div class="chat-card">
+            <div id="chat-log" class="chat-log"></div>
+            <div class="chat-input">
+              <input id="chat-text" placeholder="Message rider..." maxlength="500" />
+              <button id="btn-chat-send" class="primary">Send</button>
+            </div>
+          </div>
+        </div>
+        <p class="muted" style="text-align:center" id="trip-empty">You have no active trip.</p>
+      </div>
+
+      <div id="tab-driver-earn" class="hidden">
+        <h3 class="section-h">Earnings</h3>
+        <div class="earn-row">
+          <div class="earn-box">
+            <span class="muted small">Today</span>
+            <b id="earn-today-2">₦0</b>
+          </div>
+          <div class="earn-box">
+            <span class="muted small">Rating</span>
+            <b id="earn-rating-2">-</b>
+          </div>
+          <div class="earn-box">
+            <span class="muted small">Trips</span>
+            <b id="earn-trips-2">0</b>
+          </div>
+        </div>
+        <div class="wallet-box">
+          <div>
+            <span class="muted small">Wallet balance</span>
+            <b id="wallet-balance">₦0</b>
+          </div>
+          <button id="btn-withdraw" class="primary">Withdraw</button>
+        </div>
+        <form id="withdraw-form" class="hidden">
+          <label>Amount (₦)
+            <input id="w-amount" type="number" min="100" placeholder="e.g. 2000" />
+          </label>
+          <label>Bank name
+            <input id="w-bank" placeholder="e.g. GTBank" />
+          </label>
+          <label>Account number
+            <input id="w-acct" inputmode="numeric" placeholder="0123456789" />
+          </label>
+          <label>Account name
+            <input id="w-name" placeholder="Full account name" />
+          </label>
+          <button id="btn-w-submit" class="primary full">Withdraw to bank</button>
+          <p id="w-msg" class="msg"></p>
+        </form>
+      </div>
+
+      <div id="tab-driver-profile" class="hidden">
+        <h3 class="section-h">My profile</h3>
+        <div class="profile-head">
+          <div class="avatar-wrap">
+            <img id="avatar-img" class="avatar hidden" alt="avatar" />
+            <div id="avatar-fallback" class="avatar avatar-fallback">?</div>
+            <button id="btn-avatar" class="avatar-cam" title="Change photo">📷</button>
+            <input id="in-avatar" type="file" accept="image/*" class="hidden" />
+          </div>
+          <div class="profile-id">
+            <b id="profile-name">-</b>
+            <span id="profile-phone" class="muted small"></span>
+            <span id="profile-vehicle" class="muted small"></span>
+          </div>
+        </div>
+        <label>Full name
+          <input id="pf-name" placeholder="Your name" />
+        </label>
+        <label>Email
+          <input id="pf-email" type="email" placeholder="you@example.com" />
+        </label>
+        <button id="btn-save-profile" class="primary full">Save profile</button>
+        <p id="pf-msg" class="msg"></p>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="bnav active" data-dtab="requests"><span>📋</span>Requests</button>
+      <button class="bnav" data-dtab="trip"><span>🚦</span>Trip</button>
+      <button class="bnav" data-dtab="earn"><span>💰</span>Earnings</button>
+      <button class="bnav" data-dtab="profile"><span>👤</span>Profile</button>
+    </nav>
+
+    <div id="account-panel" class="overlay-card account-card hidden">
+      <div class="pop-head">
+        <b>Account</b>
+        <button id="btn-account-close" class="x" title="Close">✕</button>
+      </div>
+      <div class="acct-nav">
+        <button class="acct-tab active" data-act="profile">Profile</button>
+        <button class="acct-tab" data-act="payment">Payment</button>
+        <button class="acct-tab" data-act="support">Support</button>
+        <button class="acct-tab" data-act="safety">Safety</button>
+        <button class="acct-tab" data-act="saved">Saved</button>
+        <button class="acct-tab" data-act="settings">Settings</button>
+        <button class="acct-tab" data-act="earn">Earn</button>
+      </div>
+
+      <div id="acct-profile">
+        <div class="profile-head">
+          <div class="avatar-wrap">
+            <img id="acct-avatar-img" class="avatar hidden" alt="avatar" />
+            <div id="acct-avatar-fallback" class="avatar avatar-fallback">?</div>
+            <button id="acct-avatar-btn" class="avatar-cam" title="Change photo">📷</button>
+            <input id="acct-avatar" type="file" accept="image/*" class="hidden" />
+          </div>
+          <div class="profile-id">
+            <b id="acct-name-display">-</b>
+            <span id="acct-phone-display" class="muted small"></span>
+            <span id="acct-vehicle-display" class="muted small"></span>
+          </div>
+        </div>
+        <label>Full name
+          <input id="acct-name" placeholder="Your name" />
+        </label>
+        <label>Email
+          <input id="acct-email" type="email" placeholder="you@example.com" />
+        </label>
+        <button id="acct-save-profile" class="primary full">Save profile</button>
+        <p id="acct-pf-msg" class="msg"></p>
+      </div>
+
+      <div id="acct-payment" class="hidden">
+        <div class="wallet-box">
+          <div>
+            <span class="muted small">Wallet balance</span>
+            <b id="acct-wallet-balance">₦0</b>
+          </div>
+        </div>
+        <form id="acct-withdraw-form">
+          <label>Amount (₦)
+            <input id="acct-w-amount" type="number" min="100" placeholder="e.g. 2000" />
+          </label>
+          <label>Bank name
+            <input id="acct-w-bank" placeholder="e.g. GTBank" />
+          </label>
+          <label>Account number
+            <input id="acct-w-acct" inputmode="numeric" placeholder="0123456789" />
+          </label>
+          <label>Account name
+            <input id="acct-w-name" placeholder="Full account name" />
+          </label>
+          <button id="acct-w-submit" class="primary full">Withdraw to bank</button>
+          <p id="acct-w-msg" class="msg"></p>
+        </form>
+      </div>
+
+      <div id="acct-support" class="hidden">
+        <p class="muted">Need help? Message our support team and we'll respond fast.</p>
+        <label>Message
+          <textarea id="support-msg" rows="4" placeholder="Describe your issue..."></textarea>
+        </label>
+        <button id="btn-support-send" class="primary full">Send message</button>
+        <p class="muted small" style="margin-top:10px">Phone: +234 800 123 4567 · Email: support@isafedrive.com</p>
+      </div>
+
+      <div id="acct-safety" class="hidden">
+        <button id="btn-sos" class="danger full" style="font-size:18px;padding:18px">🆘 SOS — Emergency</button>
+        <p class="muted small" style="margin:10px 0">Press to alert emergency contacts and iSafeDrive safety team with your live location.</p>
+        <ul class="tips">
+          <li>Keep your phone charged and mounted while driving.</li>
+          <li>Share your live trip status with a trusted contact.</li>
+          <li>If you feel unsafe, park in a public area and use SOS.</li>
+          <li>Verify the rider's PIN before starting the trip.</li>
+        </ul>
+      </div>
+
+      <div id="acct-saved" class="hidden">
+        <label>Add a saved place
+          <input id="saved-input" placeholder="e.g. Home — 12 Allen Ave, Ikeja" />
+        </label>
+        <button id="btn-saved-add" class="primary full">Add place</button>
+        <ul id="saved-list" class="mini-list" style="margin-top:10px"></ul>
+      </div>
+
+      <div id="acct-settings" class="hidden">
+        <label class="toggle-row">Ride request notifications
+          <input id="set-notif" type="checkbox" checked />
+        </label>
+        <label class="toggle-row">Sound alerts
+          <input id="set-sound" type="checkbox" checked />
+        </label>
+        <label class="toggle-row">Auto-accept nearby rides
+          <input id="set-auto" type="checkbox" />
+        </label>
+        <button id="btn-logout-2" class="danger full" style="margin-top:10px">Log out</button>
+      </div>
+
+      <div id="acct-earn" class="hidden">
+        <p class="muted small">Invite other drivers to iSafeDrive and earn bonuses when they complete trips.</p>
+        <label>Your referral code
+          <input id="earn-code" readonly />
+        </label>
+        <button id="btn-earn-copy" class="primary full">Copy referral code</button>
+      </div>
+    </div>
+
+    <p id="toast" class="toast hidden"></p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

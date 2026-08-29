@@ -1,0 +1,16 @@
+# Cloudflared named-tunnel config (permanent URL via Cloudflare)
+# Replace TUNNEL_ID and YOURDOMAIN.COM, then run:
+#   cloudflared tunnel --config <thisfile> run isafedrive
+# (credentials-file is auto-created when the tunnel is created via `cloudflared tunnel create`)
+
+tunnel: TUNNEL_ID
+credentials-file: C:\Users\user\.cloudflared\TUNNEL_ID.json
+
+ingress:
+  - hostname: pax.YOURDOMAIN.COM
+    service: http://localhost:3200
+  - hostname: driver.YOURDOMAIN.COM
+    service: http://localhost:3300
+  - hostname: admin.YOURDOMAIN.COM
+    service: http://localhost:3100
+  - service: http_status:404

@@ -1,0 +1,25 @@
+{
+  "name": "isafedrive",
+  "version": "1.0.0",
+  "private": true,
+  "description": "iSafeDrive - Ride-hailing platform for Nigeria (API, Passenger app, Driver app, Admin dashboard)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:db": "node scripts/dev-db.mjs",
+    "dev:api": "npm run start:dev -w apps/api",
+    "dev:pax": "npm run dev -w apps/passenger-web",
+    "dev:admin": "npm run dev -w apps/admin-dashboard",
+    "build": "npm run build -w packages/shared && npm run build -w apps/api && npm run build -w apps/admin-dashboard",
+    "typecheck": "npm run typecheck -w apps/api && npm run typecheck -w apps/admin-dashboard",
+    "test:api": "npm run test -w apps/api"
+  },
+  "devDependencies": {
+    "embedded-postgres": "^18.4.0-beta.17"
+  }
+}

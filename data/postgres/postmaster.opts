@@ -1,0 +1,1 @@
+C:/Users/user/Downloads/iSafedriveTaxii/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "data/postgres" "-p" "5432"

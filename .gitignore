@@ -1,0 +1,15 @@
+node_modules/
+dist/
+logs/
+*.log
+.env
+.env.*
+.DS_Store
+apkbuild*/
+android/
+android-build/
+credentials.json
+cloudflared-ingress.yml
+.next/
+.turbo/
+isafedrive_colab.zip

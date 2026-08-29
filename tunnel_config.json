@@ -1,0 +1,1 @@
+{"config_src":"cloudflare","ingress":[{"hostname":"pax.isafedrive.com","service":"http://localhost:3200"},{"hostname":"driver.isafedrive.com","service":"http://localhost:3300"},{"hostname":"admin.isafedrive.com","service":"http://localhost:3100"},{"service":"http_status:404"}]}

@@ -1,0 +1,79 @@
+# Portable Docker Compose for iSafeDrive — works with Coolify, CapRover, or `docker compose up`.
+# Internal networking is plain HTTP; the host PaaS (Coolify/CapRover) adds the HTTPS reverse proxy + SSL.
+# In Coolify/CapRover: point the project at this repo, it reads this file, build each service, and assign a domain.
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: isafedrive
+      POSTGRES_PASSWORD: isafedrive
+      POSTGRES_DB: isafedrive
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isafedrive"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://isafedrive:isafedrive@db:5432/isafedrive?sslmode=disable
+      JWT_SECRET: change-me-in-dashboard
+      JWT_REFRESH_SECRET: change-me-in-dashboard
+      NODE_ENV: development   # -> TypeORM synchronize=true creates tables on first run
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  pax:
+    build:
+      context: .
+      dockerfile: apps/passenger-web/Dockerfile
+    command: ["node", "apps/passenger-web/server.mjs"]
+    environment:
+      API_HOST: api
+      API_PORT: "3000"
+      PORT: "3200"
+    depends_on:
+      - api
+    expose:
+      - "3200"
+    restart: unless-stopped
+
+  driver:
+    build:
+      context: .
+      dockerfile: apps/driver-web/Dockerfile
+    command: ["node", "apps/driver-web/server.mjs"]
+    environment:
+      API_HOST: api
+      API_PORT: "3000"
+      PORT: "3300"
+    depends_on:
+      - api
+    expose:
+      - "3300"
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin-dashboard/Dockerfile
+    command: ["npm", "--workspace", "apps/admin-dashboard", "exec", "next", "start"]
+    environment:
+      PORT: "3100"
+    expose:
+      - "3100"
+    restart: unless-stopped
+
+volumes:
+  dbdata:

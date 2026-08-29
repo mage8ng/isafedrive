@@ -1,0 +1,66 @@
+# Render Blueprint for iSafeDrive (full-stack: API + passenger web + driver web + admin)
+# Deploy: push this repo to GitHub, create a new "Blueprint" in Render, connect the repo.
+# Service URLs (stable, permanent):
+#   API:       https://isafedrive-api.onrender.com
+#   Passenger: https://isafedrive-pax.onrender.com
+#   Driver:    https://isafedrive-driver.onrender.com
+#   Admin:     https://isafedrive-admin.onrender.com
+
+databases:
+  - name: isafedrive-db
+    databaseName: isafedrive
+    user: isafedrive
+    plan: free
+    postgresMajorVersion: 16
+
+services:
+  - type: web
+    name: isafedrive-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build -w packages/shared && npm run build -w apps/api
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: isafedrive-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false # set this in the Render dashboard (any long random string)
+      - key: JWT_REFRESH_SECRET
+        sync: false # set this in the Render dashboard (any long random string)
+
+  - type: web
+    name: isafedrive-pax
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: node apps/passenger-web/server.mjs
+    healthCheckPath: /
+    envVars:
+      - key: API_URL
+        value: https://isafedrive-api.onrender.com
+
+  - type: web
+    name: isafedrive-driver
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: node apps/driver-web/server.mjs
+    healthCheckPath: /
+    envVars:
+      - key: API_URL
+        value: https://isafedrive-api.onrender.com
+
+  - type: web
+    name: isafedrive-admin
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build -w apps/admin-dashboard
+    startCommand: npm --workspace apps/admin-dashboard exec next start
+    healthCheckPath: /
