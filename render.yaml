@@ -48,7 +48,7 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: API_URL
-        value: https://isafedrive-api.onrender.com
+        value: http://isafedrive-api:3000
 
   - type: web
     name: isafedrive-driver
@@ -62,7 +62,7 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: API_URL
-        value: https://isafedrive-api.onrender.com
+        value: http://isafedrive-api:3000
 
   # NOTE: admin-dashboard is deployed on Vercel (Next.js), not Render.
   # Vercel project: Root Directory = apps/admin-dashboard, Framework = Next.js,
